@@ -7,14 +7,14 @@ public class GameWindow extends JFrame implements WindowListener {
     private static final long serialVersionUID = 1L;
     private GamePanel gamePanel;
 
-    public GameWindow(String playerName) {
+    public GameWindow() {
         setFrame();
-        addComponents(playerName);
+        addComponents();
         setVisible(true);
     }
 
     private void setFrame() {
-        setSize(300, 600); // Adjusted size to fit game panel
+        setSize(400, 550); // Adjusted size to fit game panel
         setTitle("Apple Catching Game");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -22,7 +22,7 @@ public class GameWindow extends JFrame implements WindowListener {
         addWindowListener(this);
     }
 
-    private void addComponents(String playerName) {
+    private void addComponents() {
         gamePanel = new GamePanel();
         gamePanel.setBackground(Color.CYAN); // Background color for the game
         add(gamePanel);

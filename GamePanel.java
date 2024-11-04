@@ -13,10 +13,12 @@ import java.util.ArrayList;
 class Apple {
     Point position;
     boolean isRotten;
+    boolean isGolden;
 
-    Apple(Point position, boolean isRotten) {
+    Apple(Point position, boolean isRotten, boolean isGolden) {
         this.position = position;
         this.isRotten = isRotten;
+        this.isGolden = isGolden;
     }
 }
 
@@ -36,6 +38,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private String playerName;
     private BufferedImage appleImage;
     private BufferedImage rottenappleImage;
+    private BufferedImage goldenappleImage;
     private BufferedImage backgroundImage;
     private ArrayList<PlayerScore> leaderboard = new ArrayList<>();
 
@@ -47,6 +50,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             appleImage = resizeImage(appleImage, appleSize, appleSize);
             rottenappleImage = ImageIO.read(new File("lol/apple_rotten.png"));
             rottenappleImage = resizeImage(rottenappleImage, appleSize, appleSize);
+            goldenappleImage = ImageIO.read(new File("lol/golden_apple.png"));
+            goldenappleImage = resizeImage(goldenappleImage, appleSize*2, appleSize*2);
             backgroundImage = ImageIO.read(new File("lol/background_1.png"));
         } catch (IOException e) {
             System.out.println("Error loading image: " + e.getMessage());
@@ -101,6 +106,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 Point pos = apple.position;
                 if (apple.isRotten) {
                     g.drawImage(rottenappleImage, pos.x, pos.y, this);
+                } else if (apple.isGolden) {
+                    g.drawImage(goldenappleImage, pos.x, pos.y, this);
                 } else {
                     g.drawImage(appleImage, pos.x, pos.y, this);
                 }
@@ -132,12 +139,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
 
             for (int i = apples.size() - 1; i >= 0; i--) {
+                boolean golden = apples.get(i).isGolden;
                 boolean rotten = apples.get(i).isRotten;
                 Point apple = apples.get(i).position;
                 apple.y += 5;
                 if (apple.y > getHeight() - 50 && apple.x + appleSize >= basketX && apple.x <= basketX + basketWidth) {
                     if (rotten){
                         basketWidth = 90;
+                    } else if (golden){
+                        score+=5;
+                        apples.remove(i);
+                        checkLevelUp();
                     }
                     else{
                         score++;
@@ -163,13 +175,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int lastX = -1;
         for (int i = 0; i < count; i++) {
             int x_coord = (int) (Math.random() * (getWidth() - appleSize));
+            boolean isGolden = false;
             boolean isRotten = Math.random() < 0.3;
+            if (!isRotten){ isGolden = Math.random() < 0.3; }
             if (lastX == -1 || Math.abs(x_coord - lastX) >= 30) {
-                apples.add(new Apple(new Point(x_coord, -1 * randint(0, 100)), isRotten));
+                apples.add(new Apple(new Point(x_coord, -1 * randint(0, 100)), isRotten, isGolden));
             } else {
                 int offset = randint(-30, 30);
                 x_coord = Math.max(0, Math.min(x_coord + offset, getWidth() - appleSize));
-                apples.add(new Apple(new Point(x_coord, -1 * randint(0, 100)), isRotten));
+                apples.add(new Apple(new Point(x_coord, -1 * randint(0, 100)), isRotten, isGolden));
             }
             lastX = x_coord;
         }
